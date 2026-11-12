@@ -54,13 +54,13 @@ benford.mad <- function(x) {
     1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(d) - proporcion.benford(d))))
 }
 
-benford.canton <- function(df, canal, cantones) {
+benford.canton <- function(df, canal.benford, cantones) {
     # Recibe: un (df) de transacciones, un (canal) a consultar y un df de (cantones)
     # Devuelve: un df con el mad de cada cantón para el canal
     # especificado, incluyendo cod_canton, n y clase de Nigrini
 
     df |>
-        filter(canal == canal) |>
+        filter(canal == canal.benford) |>
         summarise(
             n = n(),
             mad = benford.mad(monto_crc),
@@ -72,7 +72,7 @@ benford.canton <- function(df, canal, cantones) {
             ),
             .by = "cod_canton"
         ) |>
-        left_join(cantones) |>
+        left_join(cantones, by = "cod_canton") |>
         select(-provincia) |>
         arrange(desc(mad))
 }
