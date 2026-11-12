@@ -1,0 +1,71 @@
+---
+title: "Tarea #2"
+author: José Gabriel Coronel Cascante
+execute:
+  eval: true
+  output: true
+  echo: true
+format:
+  html:
+    embed-resources: true
+---
+
+# Hoja de Respuestas
+
+```
+
+RESULTADO_1A = 35
+RESULTADO_1B = 2025-01-07
+RESULTADO_1C = 26
+RESULTADO_2A =
+RESULTADO_2B =
+RESULTADO_2C =
+RESULTADO_2D =
+RESULTADO_3A =
+RESULTADO_3B =
+RESULTADO_3C =
+
+```
+
+``` {r}
+#| output: false
+
+library(readr)
+library(tidyr)
+
+source("cod/funciones_tarea3.R")
+
+parametros <- read_csv2("config/parametros_tarea3.csv") |>
+    pivot_wider(names_from = "parametro", values_from="valor")
+
+transacciones <- read_csv2("data/transacciones_2025.csv")
+
+```
+
+# Alertas por ventana móvil
+
+``` {r}
+
+ventana <- as.integer(parametros$ventana)
+k.alerta <- as.double(parametros$k.alerta)
+
+mi.resultado <- alerta.movil(transacciones, ventana, k.alerta)
+
+# Cantidad de días con alerta de mis parámetros
+mi.resultado |>
+    filter(alerta) |>
+    nrow()
+
+# Fecha de la primera alerta con mis parámetros
+mi.resultado |>
+    filter(alerta) |>
+    arrange(fecha) |>
+    head(1) |>
+    select(fecha)
+
+# Cantidad de días con alerta con v = 7 y k = 2
+alerta.movil(transacciones, 7, 2) |>
+    filter(alerta) |>
+    nrow()
+
+```
