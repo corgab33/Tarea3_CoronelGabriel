@@ -1,5 +1,5 @@
 ---
-title: "Tarea #2"
+title: "Tarea #3"
 author: José Gabriel Coronel Cascante
 execute:
   eval: true
@@ -32,6 +32,7 @@ RESULTADO_3C =
 
 library(readr)
 library(tidyr)
+library(ggplot2)
 
 source("cod/funciones_tarea3.R")
 
@@ -69,3 +70,18 @@ alerta.movil(transacciones, 7, 2) |>
     nrow()
 
 ```
+
+``` {r}
+
+mi.resultado |>
+    ggplot(aes(x = fecha, y = n.tx)) +
+    geom_line(color = "gray50") +
+    geom_point(data = subset(mi.resultado, alerta == 1),
+               color = "red", size = 2) +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+    labs(title = "Serie diaria con días de alerta señalados",
+         x = "Fecha", y = "Número de Transacciones") +
+    theme_minimal()
+
+```
+
