@@ -33,3 +33,23 @@ alerta.movil <- function(df, ventana, k.alerta) {
             alerta = n.tx > media + k.alerta * desv
         )
 }
+
+benford.mad <- function(x) {
+    # Recibe: un vector de montos (x)
+    # Devuelve: la desviación absoluta media
+
+    primeros.digitos <- floor(x / 10^(floor(log10(x))))
+
+    proporcion.benford <- function(digito) {
+        log10(1 + 1/digito)
+    }
+
+    proporcion.simple <- function(digito) {
+        ocurrencias <- sum(primeros.digitos == digito)
+        cantidad.total <- length(primeros.digitos)
+
+        ocurrencias / cantidad.total
+    }
+
+    1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(d) - proporcion.benford(d))))
+}
