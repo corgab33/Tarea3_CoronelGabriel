@@ -53,3 +53,26 @@ benford.mad <- function(x) {
 
     1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(d) - proporcion.benford(d))))
 }
+
+benford.canton <- function(df, canal, cantones) {
+    # Recibe: un (df) de transacciones, un (canal) a consultar y un df de (cantones)
+    # Devuelve: un df con el mad de cada cantón para el canal
+    # especificado, incluyendo cod_canton, n y clase de Nigrini
+
+    df |>
+        filter(canal == canal) |>
+        summarise(
+            n = n(),
+            mad = benford.mad(monto_crc),
+            clase = case_when(
+                mad <= 0.006 ~ "conformidad cercana",
+                (mad > 0.006 && mad <= 0.012) ~ "conformidad aceptable",
+                (mad > 0.012 && mad <= 0.015) ~ "conformidad marginal",
+                .default = "no conformidad"
+            ),
+            .by = "cod_canton"
+        ) |>
+        left_join(cantones) |>
+        select(-provincia) |>
+        arrange(desc(mad))
+}
