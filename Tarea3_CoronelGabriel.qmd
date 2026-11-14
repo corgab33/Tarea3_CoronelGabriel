@@ -118,3 +118,21 @@ benford.canton(transacciones, "Web", cantones) |>
 
 ```
 
+``` {r}
+
+tibble(
+  digito = 1:9,
+  proporcion = map_dbl(digito, \(d) proporcion.simple(transacciones.canal.benford$monto_crc, d)),
+  benford = log10(1 + 1/digito)
+) |>
+    ggplot(aes(x = digito)) +
+    geom_col(aes(y = proporcion, fill = "Observado"), width = 0.8) +
+    geom_line(aes(y = benford, color = "Benford", group = 1)) +
+    geom_point(aes(y = benford, color = "Benford")) +
+    scale_fill_manual(values = c("Observado" = "gray80", "Benford" = "gray30")) +
+    scale_x_continuous(breaks = 1:9) +
+    labs(x = "Primer dígito", y = "Proporción", fill = NULL) +
+    theme_minimal()
+
+```
+
