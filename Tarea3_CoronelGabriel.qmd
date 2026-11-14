@@ -17,10 +17,10 @@ format:
 RESULTADO_1A = 35
 RESULTADO_1B = 2025-01-07
 RESULTADO_1C = 26
-RESULTADO_2A =
-RESULTADO_2B =
-RESULTADO_2C =
-RESULTADO_2D =
+RESULTADO_2A = 0.0031
+RESULTADO_2B = Montes De Oca
+RESULTADO_2C = 5
+RESULTADO_2D = Montes De Oca
 RESULTADO_3A =
 RESULTADO_3B =
 RESULTADO_3C =
@@ -40,6 +40,8 @@ parametros <- read_csv2("config/parametros_tarea3.csv") |>
     pivot_wider(names_from = "parametro", values_from="valor")
 
 transacciones <- read_csv2("data/transacciones_2025.csv")
+
+cantones <- read_csv("data/cantones.csv")
 
 ```
 
@@ -81,6 +83,60 @@ mi.resultado |>
     scale_x_date(date_breaks = "1 month", date_labels = "%b") +
     labs(title = "Serie diaria con días de alerta señalados",
          x = "Fecha", y = "Número de Transacciones") +
+    theme_minimal()
+
+```
+
+# Ley de Benford por cantón
+
+``` {r}
+
+canal.benford <- parametros$canal.benford
+
+transacciones.canal.benford <- transacciones |>
+    filter(canal == canal.benford)
+
+# MAD del canal asignado con todos los cantones
+round(benford.mad(transacciones.canal.benford$monto_crc), 4)
+
+mi.resultado.benford <- benford.canton(transacciones, canal.benford, cantones)
+
+# Cantón con la mayor MAD del canal asignado
+mi.resultado.benford |>
+    head(1) |>
+    select(canton)
+
+# Cantidad de cantones con MAD mayor a 0.015
+mi.resultado.benford |>
+    filter(mad > 0.015) |>
+    nrow()
+
+# Cantón con la mayor del canal Web
+benford.canton(transacciones, "Web", cantones) |>
+    head(1) |>
+    select(canton)
+
+```
+
+Se observa que los cantones con mayor MAD tienen una relativamente
+baja cantidad de transacciones. Por ende, el alto MAD puede entenderse
+como una consecuencia de una pequeña muestra y no como un legítimo
+fraude.
+
+``` {r}
+
+tibble(
+  digito = 1:9,
+  proporcion = map_dbl(digito, \(d) proporcion.simple(transacciones.canal.benford$monto_crc, d)),
+  benford = log10(1 + 1/digito)
+) |>
+    ggplot(aes(x = digito)) +
+    geom_col(aes(y = proporcion, fill = "Observado"), width = 0.8) +
+    geom_line(aes(y = benford, color = "Benford", group = 1)) +
+    geom_point(aes(y = benford, color = "Benford")) +
+    scale_fill_manual(values = c("Observado" = "gray80", "Benford" = "gray30")) +
+    scale_x_continuous(breaks = 1:9) +
+    labs(x = "Primer dígito", y = "Proporción", fill = NULL) +
     theme_minimal()
 
 ```

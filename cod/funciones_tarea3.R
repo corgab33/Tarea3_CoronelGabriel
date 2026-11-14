@@ -33,3 +33,49 @@ alerta.movil <- function(df, ventana, k.alerta) {
             alerta = n.tx > media + k.alerta * desv
         )
 }
+
+proporcion.simple <- function(montos, digito) {
+    # Recibe: un vector de (montos) y un (digito)
+    # Devuelve: la proporción de (digito) como primero digito en el vector de montos
+
+    primeros.digitos <- floor(montos / 10^(floor(log10(montos))))
+
+    ocurrencias <- sum(primeros.digitos == digito)
+    cantidad.total <- length(primeros.digitos)
+
+    ocurrencias / cantidad.total
+}
+
+benford.mad <- function(x) {
+    # Recibe: un vector de montos (x)
+    # Devuelve: la desviación absoluta media
+
+    proporcion.benford <- function(digito) {
+        log10(1 + 1/digito)
+    }
+
+    1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(x, d) - proporcion.benford(d))))
+}
+
+benford.canton <- function(df, canal.benford, cantones) {
+    # Recibe: un (df) de transacciones, un (canal) a consultar y un df de (cantones)
+    # Devuelve: un df con el mad de cada cantón para el canal
+    # especificado, incluyendo cod_canton, n y clase de Nigrini
+
+    df |>
+        filter(canal == canal.benford) |>
+        summarise(
+            n = n(),
+            mad = benford.mad(monto_crc),
+            clase = case_when(
+                mad <= 0.006 ~ "conformidad cercana",
+                (mad > 0.006 && mad <= 0.012) ~ "conformidad aceptable",
+                (mad > 0.012 && mad <= 0.015) ~ "conformidad marginal",
+                .default = "no conformidad"
+            ),
+            .by = "cod_canton"
+        ) |>
+        left_join(cantones, by = "cod_canton") |>
+        select(-provincia) |>
+        arrange(desc(mad))
+}
