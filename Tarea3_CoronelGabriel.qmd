@@ -118,6 +118,11 @@ benford.canton(transacciones, "Web", cantones) |>
 
 ```
 
+Se observa que los cantones con mayor MAD tienen una relativamente
+baja cantidad de transacciones. Por ende, el alto MAD puede entenderse
+como una consecuencia de una pequeña muestra y no como un legítimo
+fraude.
+
 ``` {r}
 
 tibble(
