@@ -34,24 +34,27 @@ alerta.movil <- function(df, ventana, k.alerta) {
         )
 }
 
+proporcion.simple <- function(montos, digito) {
+    # Recibe: un vector de (montos) y un (digito)
+    # Devuelve: la proporción de (digito) como primero digito en el vector de montos
+
+    primeros.digitos <- floor(montos / 10^(floor(log10(montos))))
+
+    ocurrencias <- sum(primeros.digitos == digito)
+    cantidad.total <- length(primeros.digitos)
+
+    ocurrencias / cantidad.total
+}
+
 benford.mad <- function(x) {
     # Recibe: un vector de montos (x)
     # Devuelve: la desviación absoluta media
-
-    primeros.digitos <- floor(x / 10^(floor(log10(x))))
 
     proporcion.benford <- function(digito) {
         log10(1 + 1/digito)
     }
 
-    proporcion.simple <- function(digito) {
-        ocurrencias <- sum(primeros.digitos == digito)
-        cantidad.total <- length(primeros.digitos)
-
-        ocurrencias / cantidad.total
-    }
-
-    1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(d) - proporcion.benford(d))))
+    1/9 * sum(map_dbl(1:9, \(d) abs(proporcion.simple(x, d) - proporcion.benford(d))))
 }
 
 benford.canton <- function(df, canal.benford, cantones) {
