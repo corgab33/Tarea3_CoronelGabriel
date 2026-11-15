@@ -21,9 +21,9 @@ RESULTADO_2A = 0.0031
 RESULTADO_2B = Montes De Oca
 RESULTADO_2C = 5
 RESULTADO_2D = Montes De Oca
-RESULTADO_3A =
-RESULTADO_3B =
-RESULTADO_3C =
+RESULTADO_3A = 30697955737
+RESULTADO_3B = 1003998037
+RESULTADO_3C = 30555913413
 
 ```
 
@@ -137,6 +137,47 @@ tibble(
     scale_fill_manual(values = c("Observado" = "gray80", "Benford" = "gray30")) +
     scale_x_continuous(breaks = 1:9) +
     labs(x = "Primer dígito", y = "Proporción", fill = NULL) +
+    theme_minimal()
+
+```
+
+# Valor acumulado con interés
+
+``` {r}
+
+tasa.anual <- as.double(parametros$tasa.anual)
+canal.interes <- parametros$canal.interes
+
+mi.resultado.valor.acumulado <- valor.acumulado(transacciones, tasa.anual, canal.interes)
+
+# Valor acumulado con parámetros asignados
+round(mi.resultado.valor.acumulado$va, 2)
+
+# Interés ganado con parámetros asignados
+round(mi.resultado.valor.acumulado$interes, 2)
+
+# Valor acumulado con parámetros comunes
+valor.acumulado(transacciones, 0.06, "App")[["va"]]
+
+```
+
+``` {r}
+
+tabla <- mi.resultado.valor.acumulado$tabla
+
+tibble(
+  mes = rep(tabla$mes, 2),
+  tipo = factor(
+    rep(c("Monto", "Valor acumulado (31/12)"), each = nrow(tabla)),
+    levels = c("Monto", "Valor acumulado (31/12)")
+  ),
+  valor = c(tabla$monto, tabla$monto * tabla$factor)
+) |>
+    ggplot(aes(x = factor(mes), y = valor, fill = tipo)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.3) +
+    scale_fill_manual(values = c("gray80", "gray30")) +
+    scale_y_continuous(labels = scales::label_comma()) +
+    labs(x = "Mes", y = "Colones (₡)", fill = NULL) +
     theme_minimal()
 
 ```

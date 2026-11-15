@@ -1,4 +1,5 @@
 library(dplyr)
+library(lubridate)
 library(purrr)
 
 alerta.movil <- function(df, ventana, k.alerta) {
@@ -78,4 +79,29 @@ benford.canton <- function(df, canal.benford, cantones) {
         left_join(cantones, by = "cod_canton") |>
         select(-provincia) |>
         arrange(desc(mad))
+}
+
+valor.acumulado <- function(df, tasa.anual, canal.asignado) {
+    # Recibe: un (df) de transacciones, una (tasa.anual) de interés y un (canal.asignado)
+    # Devuelve: una lista con la (tasa.mensual) efectiva, una (tabla) de montos y factores,
+    # el valor acumulado (va) y el interés pagado (interes)
+
+    tasa.mensual <- (1 + tasa.anual)^(1/12) - 1
+
+    tabla <- df |>
+        filter(canal == canal.asignado) |>
+        mutate(mes = month(fecha)) |>
+        summarise(monto = sum(monto_crc), .by = "mes") |>
+        mutate(factor = (1 + tasa.mensual)^(12 - mes))
+
+    va <- sum(tabla$monto * tabla$factor)
+
+    interes <- va - sum(tabla$monto)
+
+    list(
+        tabla = tabla,
+        tasa.mensual = tasa.mensual,
+        va = va,
+        interes = interes
+    )
 }
