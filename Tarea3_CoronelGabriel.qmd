@@ -140,7 +140,8 @@ grafico.benford <- tibble(
     geom_point(aes(y = benford, color = "Benford")) +
     scale_fill_manual(values = c("Observado" = "gray80", "Benford" = "gray30")) +
     scale_x_continuous(breaks = 1:9) +
-    labs(x = "Primer dígito", y = "Proporción", fill = NULL) +
+    labs(title = "Pocas transacciones causan alto MAD en algunos cantones",
+         x = "Primer dígito", y = "Proporción", fill = NULL, colour = NULL) +
     theme_minimal()
 
 ggsave("info/figuras/ejercicio-2.png", plot = grafico.benford)
@@ -184,10 +185,10 @@ grafico.valor.acumulado <- tibble(
     geom_col(position = position_dodge(width = 0.8), width = 0.3) +
     scale_fill_manual(values = c("gray80", "gray30")) +
     scale_y_continuous(labels = scales::label_comma()) +
-    labs(x = "Mes", y = "Colones", fill = NULL) +
+    labs(title = "Monto mensual vs. Valor acumulado en cada mes",
+         x = "Mes", y = "Colones", fill = NULL) +
     theme_minimal()
 
 ggsave("info/figuras/ejercicio-3.png", plot = grafico.valor.acumulado)
 
 ```
-
