@@ -161,3 +161,24 @@ valor.acumulado(transacciones, 0.06, "App")[["va"]]
 
 ```
 
+``` {r}
+
+tabla <- mi.resultado.valor.acumulado$tabla
+
+tibble(
+  mes = rep(tabla$mes, 2),
+  tipo = factor(
+    rep(c("Monto", "Valor acumulado (31/12)"), each = nrow(tabla)),
+    levels = c("Monto", "Valor acumulado (31/12)")
+  ),
+  valor = c(tabla$monto, tabla$monto * tabla$factor)
+) |>
+    ggplot(aes(x = factor(mes), y = valor, fill = tipo)) +
+    geom_col(position = position_dodge(width = 0.8), width = 0.3) +
+    scale_fill_manual(values = c("gray80", "gray30")) +
+    scale_y_continuous(labels = scales::label_comma()) +
+    labs(x = "Mes", y = "Colones (₡)", fill = NULL) +
+    theme_minimal()
+
+```
+
