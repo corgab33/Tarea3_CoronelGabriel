@@ -74,8 +74,9 @@ alerta.movil(transacciones, 7, 2) |>
 ```
 
 ``` {r}
+#| output: false
 
-mi.resultado |>
+grafico.ventana.movil <- mi.resultado |>
     ggplot(aes(x = fecha, y = n.tx)) +
     geom_line(color = "gray50") +
     geom_point(data = subset(mi.resultado, alerta == 1),
@@ -84,6 +85,8 @@ mi.resultado |>
     labs(title = "Serie diaria con días de alerta señalados",
          x = "Fecha", y = "Número de Transacciones") +
     theme_minimal()
+
+ggsave("info/figuras/ejercicio-1.png", plot = grafico.ventana.movil)
 
 ```
 
@@ -124,8 +127,9 @@ como una consecuencia de una pequeña muestra y no como un legítimo
 fraude.
 
 ``` {r}
+#| output: false
 
-tibble(
+grafico.benford <- tibble(
   digito = 1:9,
   proporcion = map_dbl(digito, \(d) proporcion.simple(transacciones.canal.benford$monto_crc, d)),
   benford = log10(1 + 1/digito)
@@ -138,6 +142,8 @@ tibble(
     scale_x_continuous(breaks = 1:9) +
     labs(x = "Primer dígito", y = "Proporción", fill = NULL) +
     theme_minimal()
+
+ggsave("info/figuras/ejercicio-2.png", plot = grafico.benford)
 
 ```
 
@@ -162,10 +168,11 @@ valor.acumulado(transacciones, 0.06, "App")[["va"]]
 ```
 
 ``` {r}
+#| output: false
 
 tabla <- mi.resultado.valor.acumulado$tabla
 
-tibble(
+grafico.valor.acumulado <- tibble(
   mes = rep(tabla$mes, 2),
   tipo = factor(
     rep(c("Monto", "Valor acumulado (31/12)"), each = nrow(tabla)),
@@ -177,8 +184,10 @@ tibble(
     geom_col(position = position_dodge(width = 0.8), width = 0.3) +
     scale_fill_manual(values = c("gray80", "gray30")) +
     scale_y_continuous(labels = scales::label_comma()) +
-    labs(x = "Mes", y = "Colones (₡)", fill = NULL) +
+    labs(x = "Mes", y = "Colones", fill = NULL) +
     theme_minimal()
+
+ggsave("info/figuras/ejercicio-3.png", plot = grafico.valor.acumulado)
 
 ```
 
